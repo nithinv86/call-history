@@ -1,0 +1,59 @@
+{
+  "name": "call-history",
+  "version": "0.0.0",
+  "description": "Convert teams call history to entries",
+  "main": "index.js",
+  "author": {
+    "name": "Nithin V",
+    "email": "mails2nithin@gmail.com"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/nithinv86/call-history.git"
+  },
+  "keywords": [
+    "call",
+    "history",
+    "call-history",
+    "teams",
+    "convert"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/nithinv86/call-history/issues"
+  },
+  "homepage": "https://gitlab.com/nithinv86/call-history#readme",
+  "dependencies": {
+    "compression": "~1.7.4",
+    "date-fns": "~2.30.0",
+    "dotenv": "~16.4.5",
+    "enquirer": "^2.4.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "~7.3.1",
+    "eslint": "~8.57.0",
+    "eslint-config-semistandard": "~17.0.0",
+    "eslint-config-standard": "~17.1.0",
+    "eslint-plugin-import": "~2.29.1",
+    "eslint-plugin-n": "~15.7.0",
+    "eslint-plugin-promise": "~6.1.1",
+    "husky": "~4.3.6",
+    "lint-staged": "~15.2.2",
+    "prettier": "~3.2.5"
+  },
+  "lint-staged": {
+    "**/*.(js)": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "type": "commonjs"
+}
