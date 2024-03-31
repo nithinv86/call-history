@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { filterCalls } = require('./services/filter');
+const { filterCalls, removeEmpty } = require('./services/filter');
 const initNpm = async () => {
-  const [type, ...values] = (process.argv || []).splice(2);
+  let [type, ...values] = (process.argv || []).splice(2);
 
   if (!type) {
     console.error('Arrgument missing...');
@@ -15,6 +15,14 @@ const initNpm = async () => {
   if (type === '-help') {
     console.log('Usage: call -[type] [values]');
   } else if (type === 'filter') {
+    if (values?.length) {
+      values[0] = ` ${values[0]}`;
+    }
+
+    values = removeEmpty(values.join(' '))
+      .split(' -')
+      .filter((item) => item);
+
     filterCalls(values);
   }
 };

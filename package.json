@@ -1,11 +1,14 @@
 {
   "name": "@mails2nithin/call-history",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Convert teams call history to entries",
   "main": "index.js",
   "author": {
     "name": "Nithin V",
     "email": "mails2nithin@gmail.com"
+  },
+  "bin": {
+    "calls": "./index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -40,10 +40,9 @@ const getLastDayOfWeek = (inputString) => {
 
   return targetDate;
 };
-
 const filterCalls = async (values) => {
   const filter = {};
-  const keyMap = { f: 'from', from: 'from', t: 'to', to: 'to' };
+  const keyMap = { from: 'from', to: 'to' };
 
   if (values?.length) {
     for (const item of values) {
@@ -57,7 +56,7 @@ const filterCalls = async (values) => {
       if (keyMap[key]) {
         filter[keyMap[key]] = new Date(itemValue).toISOString().split('T')[0];
       } else {
-        filter.data = itemValue;
+        filter.task = itemValue;
       }
     }
   }
@@ -65,6 +64,7 @@ const filterCalls = async (values) => {
   const filePath = path.join(userDesktopDir, 'teams-call.txt');
   let content = fs.readFileSync(filePath, 'utf8');
   let start = false;
+  let output;
 
   if (!content) {
     console.error('call history not found...');
@@ -95,6 +95,8 @@ const filterCalls = async (values) => {
       let [person, direction, time, day] = curr.split(/\n/g);
 
       if (day && roundTimeTo5(time)) {
+        person = person.split(', ').sort().join(',');
+
         if (day.length === 5 && day !== 'Today') {
           day = 'Today';
         }
@@ -134,9 +136,62 @@ const filterCalls = async (values) => {
   prompt
     .run()
     .then((answer) => {
-      console.log('Selected calls:', answer);
+      output = choices.reduce((acc, { value, name }) => {
+        if (answer.includes(name)) {
+          if (!acc[value.day]) {
+            acc[value.day] = { [value.person]: { duration: 0, remarks: '', remarksArray: [] } };
+          }
+
+          if (!acc[value.day][value.person]) {
+            acc[value.day][value.person] = { duration: 0, remarks: '', remarksArray: [] };
+          }
+
+          acc[value.day][value.person].duration += +value.time;
+          acc[value.day][value.person].remarksArray.push(`${value.person} - ${value.time}`);
+          acc[value.day][value.person].remarks =
+            acc[value.day][value.person].remarksArray.join(', ');
+        }
+
+        return acc;
+      }, {});
+
+      joinCalls(output, filter.task);
     })
     .catch(console.error);
 };
+const joinCalls = (entriesByDate, task) => {
+  let output = '';
 
-module.exports = { filterCalls };
+  for (const [date, persons] of Object.entries(entriesByDate)) {
+    for (const { duration, remarks } of Object.values(persons)) {
+      output += `time add -t ${task} -dt ${date} -w Internal calls -du ${duration} -r ${remarks}\n`;
+    }
+  }
+
+  console.log(output);
+};
+const removeEmpty = (obj) => {
+  for (let [key, val] of Object.entries(obj)) {
+    if (val && typeof val === 'object') {
+      this.removeEmpty(val);
+
+      if (!(Object.keys(val).length || val instanceof Date)) {
+        delete obj[key];
+      }
+    } else {
+      if (typeof val === 'string') {
+        val = val.trim();
+      }
+
+      if (val === null || val === undefined || val === '') {
+        delete obj[key];
+      } else {
+        obj[key] = val;
+      }
+    }
+  }
+
+  return obj;
+};
+
+module.exports = { filterCalls, removeEmpty };
