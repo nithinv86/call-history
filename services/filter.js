@@ -147,7 +147,7 @@ const filterCalls = async (values) => {
           }
 
           acc[value.day][value.person].duration += +value.time;
-          acc[value.day][value.person].remarksArray.push(`${value.person} - ${value.time}`);
+          acc[value.day][value.person].remarksArray.push(`${value.person} - ${value.time}m`);
           acc[value.day][value.person].remarks =
             acc[value.day][value.person].remarksArray.join(', ');
         }
@@ -164,7 +164,7 @@ const joinCalls = (entriesByDate, task) => {
 
   for (const [date, persons] of Object.entries(entriesByDate)) {
     for (const { duration, remarks } of Object.values(persons)) {
-      output += `time add -t ${task} -dt ${date} -w Internal calls -du ${duration} -r ${remarks}\n`;
+      output += `timectl add -t ${task} -dt ${date} -w Internal calls -du ${duration} -r ${remarks}\n`;
     }
   }
 

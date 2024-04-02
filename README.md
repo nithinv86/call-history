@@ -64,7 +64,7 @@ Simply go to your Teams calls list, select all with `Ctrl + A`, copy the content
 - To initialize, execute the following command and input the necessary information when prompted.:
 
   ```sh
-  calls filter -task <task id> -from <start_date> -to <end_date> <>
+  call filter -task <task id> -from <start_date> -to <end_date>
   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
