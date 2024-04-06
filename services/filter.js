@@ -62,12 +62,14 @@ const filterCalls = async (values) => {
   }
 
   const filePath = path.join(userDesktopDir, 'teams-call.txt');
-  let content = fs.readFileSync(filePath, 'utf8');
+  let content;
   let start = false;
   let output;
 
-  if (!content) {
-    console.error('call history not found...');
+  try {
+    content = fs.readFileSync(filePath, 'utf8');
+  } catch (err) {
+    console.error("teams-call.txt file missing or it's empty in your desktop, please try again.");
     fs.mkdirSync(filePath, { recursive: true });
 
     process.exit(1);
