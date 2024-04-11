@@ -1,42 +1,53 @@
 #!/usr/bin/env node
 
 const initNpm = async () => {
-  let [type, ...values] = (process.argv || []).splice(2);
+  const args = process.argv.slice(2);
+  const [type, ...values] = args;
 
   if (!type) {
-    console.error('Arrgument missing...');
-    console.error("Try 'call -help'");
+    console.error('Argument missing...');
+    console.error("Try 'call help'");
     process.exit(1);
-
     return;
   }
 
   if (type === 'help' || type === 'h') {
-    console.log('Usage: call [filter] -[from] -[to] -[task]');
-    console.log(`Below are common Call History commands utilized in various scenarios:\n
-Format call history to time entry:
-  filter\t: Select and group each person's call history. For example "call filter -task <task id> -from <start_date> -to <end_date>"`);
+    displayHelp();
   } else if (type === 'version' || type === 'v') {
-    const path = require('path');
-    const packageJson = require(path.resolve(__dirname, './package.json'));
-    const packageVersion = packageJson.version;
-
-    console.log('Package version:', packageVersion);
+    displayVersion();
   } else if (type === 'filter') {
-    const { filterCalls, removeEmpty } = require('./services/filter');
-
-    if (values?.length) {
-      values[0] = ` ${values[0]}`;
-    }
-
-    values = removeEmpty(values.join(' '))
-      .split(' -')
-      .filter((item) => item);
-
-    filterCalls(values);
+    applyFilter(values);
   }
 };
 
-initNpm();
+const displayHelp = () => {
+  console.log('Usage: call [filter] -[from] -[to] -[task]');
+  console.log('Usage: call [version] | [help]');
+  console.log(`Below are common Call History commands utilized in various scenarios:\n
+Format call history to time entry:
+  filter\t: Select and group each person's call history. For example "call filter -task <task id> -from <start_date> -to <end_date>"`);
+};
 
-module.exports = { initNpm };
+const displayVersion = () => {
+  const path = require('path');
+  const packageJson = require(path.resolve(__dirname, './package.json'));
+  const packageVersion = packageJson.version;
+
+  console.log('Package version:', packageVersion);
+};
+
+const applyFilter = (values) => {
+  const { filterCalls, removeEmpty } = require('./services/filter');
+
+  if (values?.length) {
+    values[0] = ` ${values[0]}`;
+  }
+
+  const filteredValues = removeEmpty(values.join(' '))
+    .split(' -')
+    .filter((item) => item);
+
+  filterCalls(filteredValues);
+};
+
+initNpm();

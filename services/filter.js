@@ -5,42 +5,38 @@ const os = require('os');
 const path = require('path');
 
 const userDesktopDir = `${os.homedir()}/Desktop`;
-const roundTimeTo5 = (timeStr) => {
-  timeStr = timeStr.replace(/[^0-9\s]/g, '');
-  const [minutes, seconds] = timeStr.split(' ').map(Number);
+
+function roundTimeTo5(timeStr) {
+  const sanitizedTime = timeStr.replace(/[^0-9\s]/g, '');
+  const [minutes, seconds] = sanitizedTime.split(' ').map(Number);
   const totalSeconds = minutes * 60 + seconds;
   const roundedSeconds = 300 * Math.max(totalSeconds / 300);
   const roundedMinutes = Math.floor(roundedSeconds / 60);
-
   return roundedMinutes;
-};
-const getLastDayOfWeek = (inputString) => {
+}
+
+function getLastDayOfWeek(inputString) {
   const currentDate = new Date();
   let targetDate = currentDate;
 
   switch (inputString.toLowerCase()) {
-    case 'today': {
+    case 'today':
       targetDate = currentDate;
-
       break;
-    }
-    case 'yesterday': {
+    case 'yesterday':
       targetDate = subDays(currentDate, 1);
-
       break;
-    }
-    default: {
+    default:
       targetDate = currentDate;
-
       while (format(targetDate, 'EEEE').toLowerCase() !== inputString.toLowerCase()) {
         targetDate = subDays(targetDate, 1);
       }
-    }
   }
 
   return targetDate;
-};
-const filterCalls = async (values) => {
+}
+
+async function filterCalls(values) {
   const filter = {};
   const keyMap = { from: 'from', to: 'to' };
 
@@ -71,13 +67,12 @@ const filterCalls = async (values) => {
   } catch (err) {
     console.error("teams-call.txt file missing or it's empty in your desktop, please try again.");
     fs.mkdirSync(filePath, { recursive: true });
-
     process.exit(1);
   }
 
   content = content.replace(/\n{3,}/g, '\n\n');
   const calls = content?.split(/\n\n/g).reduce((acc, curr) => {
-    if (curr.includes('Contact groups')) {
+    if (curr.includes('Contact groups') || curr.includes('Speed dial')) {
       start = false;
     }
 
@@ -128,60 +123,59 @@ const filterCalls = async (values) => {
     return acc;
   }, new Set());
 
-  // console.log(calls);
   const choices = Array.from(calls).map((item) => ({
     name: `${item.day} - ${item.person} - ${item.time}`,
     value: item,
   }));
   const prompt = new MultiSelect({ name: 'calls', message: 'Select required calls', choices });
 
-  prompt
-    .run()
-    .then((answer) => {
-      output = choices.reduce((acc, { value, name }) => {
-        if (answer.includes(name)) {
-          if (!acc[value.day]) {
-            acc[value.day] = { [value.person]: { duration: 0, remarks: '', remarksArray: [] } };
-          }
-
-          if (!acc[value.day][value.person]) {
-            acc[value.day][value.person] = { duration: 0, remarks: '', remarksArray: [] };
-          }
-
-          if (acc[value.day][value.person].remarksArray?.length) {
-            acc[value.day][value.person].remarksArray.push(`${value.time}m`);
-          } else {
-            acc[value.day][value.person].remarksArray.push(`${value.person} ${value.time}m`);
-          }
-
-          acc[value.day][value.person].duration += +value.time;
-          acc[value.day][value.person].remarks =
-            acc[value.day][value.person].remarksArray.join(', ');
+  try {
+    const answer = await prompt.run();
+    output = choices.reduce((acc, { value, name }) => {
+      if (answer.includes(name)) {
+        if (!acc[value.day]) {
+          acc[value.day] = { [value.person]: { duration: 0, remarks: '', remarksArray: [] } };
         }
 
-        return acc;
-      }, {});
+        if (!acc[value.day][value.person]) {
+          acc[value.day][value.person] = { duration: 0, remarks: '', remarksArray: [] };
+        }
 
-      joinCalls(output, filter.task);
-    })
-    .catch(console.error);
-};
-const joinCalls = (entriesByDate, task) => {
+        if (acc[value.day][value.person].remarksArray?.length) {
+          acc[value.day][value.person].remarksArray.push(`${value.time}m`);
+        } else {
+          acc[value.day][value.person].remarksArray.push(`${value.person} ${value.time}m`);
+        }
+
+        acc[value.day][value.person].duration += +value.time;
+        acc[value.day][value.person].remarks = acc[value.day][value.person].remarksArray.join(', ');
+      }
+
+      return acc;
+    }, {});
+
+    joinCalls(output, filter.task);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function joinCalls(entriesByDate, task) {
   let output = '';
 
   for (const [date, persons] of Object.entries(entriesByDate)) {
     for (const { duration, remarks } of Object.values(persons)) {
-      output += `timectl add -t ${task || '<your task i d>'} -dt ${date} -w Internal calls -du ${duration} -r ${remarks}\n`;
+      output += `timectl add -t ${task || '<your task id>'} -dt ${date} -w Internal calls -du ${duration} -r ${remarks}\n`;
     }
   }
 
   console.log(output);
-};
-const removeEmpty = (obj) => {
+}
+
+function removeEmpty(obj) {
   for (let [key, val] of Object.entries(obj)) {
     if (val && typeof val === 'object') {
-      this.removeEmpty(val);
-
+      removeEmpty(val);
       if (!(Object.keys(val).length || val instanceof Date)) {
         delete obj[key];
       }
@@ -199,6 +193,6 @@ const removeEmpty = (obj) => {
   }
 
   return obj;
-};
+}
 
 module.exports = { filterCalls, removeEmpty };
