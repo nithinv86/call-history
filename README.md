@@ -5,7 +5,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://gitlab.com/nithinv86/call-history">
+  <a href="https://github.com/nithinv86/call-history">
     <img src="./favicon.png" alt="Logo" width="80" height="80">
   </a>
 </div>
@@ -101,6 +101,6 @@ If you have any questions or suggestions regarding the call history, feel free t
 
 - Email: mails2nithin@gmail.com
 
-Project Link: [https://gitlab.com/nithinv86/call-history](https://gitlab.com/nithinv86/call-history)
+Project Link: [https://github.com/nithinv86/call-history](https://github.com/nithinv86/call-history)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

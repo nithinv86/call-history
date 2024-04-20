@@ -165,7 +165,7 @@ function joinCalls(entriesByDate, task) {
 
   for (const [date, persons] of Object.entries(entriesByDate)) {
     for (const { duration, remarks } of Object.values(persons)) {
-      output += `timectl add -t ${task || '<your task id>'} -dt ${date} -w Internal calls -du ${duration} -r ${remarks}\n`;
+      output += `timectl add -dt ${date} -t ${task || '<task id>'} -w Internal calls -du ${duration} -r ${remarks}\n`;
     }
   }
 
