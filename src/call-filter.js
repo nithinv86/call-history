@@ -66,7 +66,13 @@ async function filterCalls(values) {
     content = fs.readFileSync(filePath, 'utf8');
   } catch (err) {
     console.error("teams-call.txt file missing or it's empty in your desktop, please try again.");
-    fs.mkdirSync(filePath, { recursive: true });
+    fs.appendFileSync('teams-call.txt', filePath, (err) => {
+      if (err) {
+        throw err;
+      }
+
+      console.log('String appended to file!');
+    });
     process.exit(1);
   }
 

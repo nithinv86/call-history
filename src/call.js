@@ -1,6 +1,17 @@
 #!/usr/bin/env node
+const version = require('../package.json').version;
+const program = require('commander');
 
-const initNpm = async () => {
+program
+  .version(version)
+  .command('filter', 'filter the call history')
+  .command('version', 'to get the version details')
+  .command('help', 'to generate help notes')
+  .option('-v, --version', 'to get the version details')
+  .option('-h, --help', 'to generate help notes')
+  .parse(process.argv);
+
+/* const initNpm = async () => {
   const args = process.argv.slice(2);
   const [type, ...values] = args;
 
@@ -11,11 +22,11 @@ const initNpm = async () => {
     return;
   }
 
-  if (type === 'help' || type === 'h') {
+  if (program.help) {
     displayHelp();
-  } else if (type === 'version' || type === 'v') {
+  } else if (program.version) {
     displayVersion();
-  } else if (type === 'filter') {
+    } else if (type === 'filter') {
     applyFilter(values);
   }
 };
@@ -37,7 +48,7 @@ const displayVersion = () => {
 };
 
 const applyFilter = (values) => {
-  const { filterCalls, removeEmpty } = require('./services/filter');
+  const { filterCalls, removeEmpty } = require('./call-filter');
 
   if (values?.length) {
     values[0] = ` ${values[0]}`;
@@ -50,4 +61,6 @@ const applyFilter = (values) => {
   filterCalls(filteredValues);
 };
 
-initNpm();
+if (program.version || program.help) {
+  initNpm();
+} */
